@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #444242;
+}
+
+
+.container-principal {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.caixa-login {
+  position: relative;
+  background: white;
+  padding: 50px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+}
+
+.caixa-login h2 {
+  margin-bottom: 20px;
+}
+
+
+.voltar {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.campo-input {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.icone-input {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 15px;
+  color: #2f2d2d;
+  pointer-events: none;
+}
+
+.campo-input input {
+  width: 100%;
+  padding: 10px 10px 10px 50px; 
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.campo-input input:focus {
+  border-color: #0C1CAB;
+  box-shadow: 0 0 0 2px rgba(12, 28, 171, 0.2);
+}
+
+
+button {
+  width: 143px;
+  padding: 10px;
+  background: #444242;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+ 
+}
+
+button:hover {
+  background: #2f2d2d;
+}
