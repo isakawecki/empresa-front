@@ -9,6 +9,7 @@ import {
   FaShoppingCart,
   FaCog
 } from "react-icons/fa";
+import Produtos from "../Produtos";
 
 function Menu() {
   const location = useLocation();
@@ -48,7 +49,7 @@ function Menu() {
       <div className="conteudo">
         <Routes>
           <Route path="/" element={<h1>Home</h1>} />
-          <Route path="produtos" element={<h1>Produtos</h1>} />
+          <Route path="produtos" element={<Produtos />} /> 
           <Route path="fornecedores" element={<h1>Fornecedores</h1>} />
           <Route path="estoque" element={<h1>Estoque</h1>} />
           <Route path="relatorios" element={<h1>Relatórios</h1>} />

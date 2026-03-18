@@ -1,0 +1,147 @@
+*{
+      white-space: normal;    
+  word-break: break-word;  
+}
+
+.container-produtos {
+  display: flex;
+  height: 100%;
+}
+
+.lista {
+  flex: 2;
+  padding: 20px;
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topo button {
+  background: black;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+    text-align: left
+}
+
+tr:hover {
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+td img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+   display: block;  
+  margin: 0 ;
+ 
+}
+
+.detalhe {
+  flex: 1;
+  padding: 20px;
+  color: white;
+  border-left: 1px solid #ddd;
+  background: #292929;
+}
+
+.detalhe img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.detalhe button {
+  margin-right: 10px;
+  padding: 8px;
+}
+
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  
+}
+
+.modal input{
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acoes {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.botaosal{
+    margin-right: 5px;
+}
+
+
+.texto-limitado {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nome-produto {
+  max-width: 150px;
+  white-space: normal;    
+  word-break: break-word;   
+}
+
+.descricao-produto {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chis {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+
+}
+
