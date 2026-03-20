@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./style.css";
 
 export default function Produtos() {
@@ -14,17 +14,54 @@ export default function Produtos() {
   const [selecionado, setSelecionado] = useState(null);
   const [modalAdd, setModalAdd] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
-  const [modalDelete, setModalDelete] = useState(false);
-  const [tipoRemocao, setTipoRemocao] = useState("tudo");
-  const [qtdRemover, setQtdRemover] = useState(0);
+
+  // 🔥 carregar produtos
+  useEffect(() => {
+    const carregar = () => {
+      const dados = JSON.parse(localStorage.getItem("produtos")) || [];
+      setProdutos(dados);
+    };
+
+    carregar();
+
+    // escuta atualização vinda da venda
+    window.addEventListener("produtosAtualizados", carregar);
+
+    return () => {
+      window.removeEventListener("produtosAtualizados", carregar);
+    };
+  }, []);
+
+  // salvar sempre que mudar
+  useEffect(() => {
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+  }, [produtos]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const adicionarProduto = () => {
-    const novo = { ...form, id: Date.now() };
-    setProdutos([...produtos, novo]);
+    if (!form.nome || !form.preco || !form.estoque) {
+      alert("Preencha os campos");
+      return;
+    }
+
+    const novo = {
+      ...form,
+      id: Date.now(),
+      preco: Number(form.preco),
+      estoque: Number(form.estoque),
+    };
+
+    const novos = [...produtos, novo];
+
+    setProdutos(novos);
+    localStorage.setItem("produtos", JSON.stringify(novos));
+
+    // 🔥 avisa outras telas
+    window.dispatchEvent(new Event("produtosAtualizados"));
+
     limparForm();
     setModalAdd(false);
   };
@@ -35,27 +72,25 @@ export default function Produtos() {
   };
 
   const salvarEdicao = () => {
-    setProdutos(produtos.map((p) => (p.id === form.id ? form : p)));
+    const atualizados = produtos.map((p) =>
+      p.id === form.id
+        ? {
+            ...form,
+            preco: Number(form.preco),
+            estoque: Number(form.estoque),
+          }
+        : p
+    );
+
+    setProdutos(atualizados);
+    localStorage.setItem("produtos", JSON.stringify(atualizados));
+
+    // 🔥 avisa atualização
+    window.dispatchEvent(new Event("produtosAtualizados"));
+
     setSelecionado(form);
     limparForm();
     setModalEdit(false);
-  };
-
-  const confirmarDelete = () => {
-    if (tipoRemocao === "tudo") {
-      setProdutos(produtos.filter((p) => p.id !== selecionado.id));
-      setSelecionado(null);
-    } else {
-      setProdutos(
-        produtos.map((p) => {
-          if (p.id === selecionado.id) {
-            return { ...p, estoque: Math.max(0, p.estoque - qtdRemover) };
-          }
-          return p;
-        }),
-      );
-    }
-    setModalDelete(false);
   };
 
   const limparForm = () => {
@@ -71,7 +106,6 @@ export default function Produtos() {
 
   return (
     <div className="container-produtos">
-      {/* LISTA */}
       <div className="lista">
         <div className="topo">
           <h2>Produtos</h2>
@@ -88,14 +122,13 @@ export default function Produtos() {
               <th>Preço</th>
             </tr>
           </thead>
+
           <tbody>
             {produtos.map((p) => (
               <tr key={p.id} onClick={() => setSelecionado(p)}>
-                <td>
-                  <img src={p.foto} alt="" />
-                </td>
-                <td className="nome-produto">{p.nome}</td>
-                <td className="descricao-produto">{p.descricao}</td>
+                <td><img src={p.foto} alt="" /></td>
+                <td>{p.nome}</td>
+                <td>{p.descricao}</td>
                 <td>{p.estoque}</td>
                 <td>R$ {p.preco}</td>
               </tr>
@@ -104,113 +137,36 @@ export default function Produtos() {
         </table>
       </div>
 
-    
+      {/* DETALHE */}
       {selecionado && (
         <div className="detalhe">
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className="topo-detalhe">
             <h3>Produto</h3>
-            <button className="chis" onClick={() => setSelecionado(null)}>
-              X
-            </button>
+            <button onClick={() => setSelecionado(null)}>X</button>
           </div>
 
           <img src={selecionado.foto} alt="" />
 
-          <p>
-            <b>Nome:</b> {selecionado.nome}
-          </p>
-          <p>
-            <b>Descrição:</b> {selecionado.descricao}
-          </p>
-          <p>
-            <b>Preço:</b> R$ {selecionado.preco}
-          </p>
-          <p>
-            <b>Estoque:</b> {selecionado.estoque}
-          </p>
+          <p><b>Nome:</b> {selecionado.nome}</p>
+          <p><b>Descrição:</b> {selecionado.descricao}</p>
+          <p><b>Preço:</b> R$ {selecionado.preco}</p>
+          <p><b>Estoque:</b> {selecionado.estoque}</p>
 
           <button onClick={abrirEditar}>Editar</button>
-          <button onClick={() => setModalDelete(true)}>Remover</button>
         </div>
       )}
 
-
-      {modalDelete && (
-        <div className="modal-bg">
-          <div className="modal">
-            <h3>Remover produto</h3>
-
-            <label>
-              <input
-                type="radio"
-                checked={tipoRemocao === "tudo"}
-                onChange={() => setTipoRemocao("tudo")}
-              />{" "}
-              Remover tudo
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                checked={tipoRemocao === "quantidade"}
-                onChange={() => setTipoRemocao("quantidade")}
-              />{" "}
-              Remover quantidade
-            </label>
-
-            {tipoRemocao === "quantidade" && (
-              <input
-                type="number"
-                placeholder="Quantidade"
-                value={qtdRemover}
-                onChange={(e) => setQtdRemover(Number(e.target.value))}
-              />
-            )}
-
-            <div className="acoes">
-              <button onClick={confirmarDelete}>Confirmar</button>
-              <button onClick={() => setModalDelete(false)}>Cancelar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-
+      {/* MODAL ADD */}
       {modalAdd && (
         <div className="modal-bg">
           <div className="modal">
-            <h3>Adicionar produto</h3>
+            <h3>Adicionar Produto</h3>
 
-            <input
-              name="nome"
-              placeholder="Nome"
-              value={form.nome}
-              onChange={handleChange}
-            />
-            <input
-              name="descricao"
-              placeholder="Descrição"
-              value={form.descricao}
-              onChange={handleChange}
-            />
-            <input
-              name="preco"
-              placeholder="Preço"
-              value={form.preco}
-              onChange={handleChange}
-            />
-            <input
-              name="estoque"
-              placeholder="Estoque"
-              value={form.estoque}
-              onChange={handleChange}
-            />
-            <input
-              name="foto"
-              placeholder="URL da imagem"
-              value={form.foto}
-              onChange={handleChange}
-            />
+            <input name="nome" value={form.nome} onChange={handleChange} placeholder="Nome" />
+            <input name="descricao" value={form.descricao} onChange={handleChange} placeholder="Descrição" />
+            <input name="preco" type="number" value={form.preco} onChange={handleChange} placeholder="Preço" />
+            <input name="estoque" type="number" value={form.estoque} onChange={handleChange} placeholder="Estoque" />
+            <input name="foto" value={form.foto} onChange={handleChange} placeholder="Imagem" />
 
             <div className="acoes">
               <button onClick={adicionarProduto}>Salvar</button>
@@ -224,38 +180,13 @@ export default function Produtos() {
       {modalEdit && (
         <div className="modal-bg">
           <div className="modal">
-            <h3>Editar produto</h3>
+            <h3>Editar Produto</h3>
 
-            <input
-              name="nome"
-              placeholder="Nome"
-              value={form.nome}
-              onChange={handleChange}
-            />
-            <input
-              name="descricao"
-              placeholder="Descrição"
-              value={form.descricao}
-              onChange={handleChange}
-            />
-            <input
-              name="preco"
-              placeholder="Preço"
-              value={form.preco}
-              onChange={handleChange}
-            />
-            <input
-              name="estoque"
-              placeholder="Estoque"
-              value={form.estoque}
-              onChange={handleChange}
-            />
-            <input
-              name="foto"
-              placeholder="URL da imagem"
-              value={form.foto}
-              onChange={handleChange}
-            />
+            <input name="nome" value={form.nome} onChange={handleChange} />
+            <input name="descricao" value={form.descricao} onChange={handleChange} />
+            <input name="preco" type="number" value={form.preco} onChange={handleChange} />
+            <input name="estoque" type="number" value={form.estoque} onChange={handleChange} />
+            <input name="foto" value={form.foto} onChange={handleChange} />
 
             <div className="acoes">
               <button onClick={salvarEdicao}>Salvar</button>

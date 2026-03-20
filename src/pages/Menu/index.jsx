@@ -10,6 +10,9 @@ import {
   FaCog
 } from "react-icons/fa";
 import Produtos from "../Produtos";
+import Fornecedores from "../Fornecedores";
+import Compras from "../Compras";
+import Vendas from "../Vendas";
 
 function Menu() {
   const location = useLocation();
@@ -18,16 +21,15 @@ function Menu() {
     { nome: "Home", path: "/menu", icon: <FaHome /> },
     { nome: "Produtos", path: "/menu/produtos", icon: <FaBox /> },
     { nome: "Fornecedores", path: "/menu/fornecedores", icon: <FaTruck /> },
-    { nome: "Estoque", path: "/menu/estoque", icon: <FaWarehouse /> },
-    { nome: "Relatórios", path: "/menu/relatorios", icon: <FaChartBar /> },
+    { nome: "Compras", path: "/menu/compras", icon: <FaWarehouse /> },
     { nome: "Vendas", path: "/menu/vendas", icon: <FaShoppingCart /> },
+    { nome: "Relatórios", path: "/menu/relatorios", icon: <FaChartBar /> },
     { nome: "Configurações", path: "/menu/configuracoes", icon: <FaCog /> },
   ];
 
   return (
     <div className="container-menu">
 
-      {/* MENU */}
       <div className="menu-lateral">
         <h3>Empresa</h3>
 
@@ -45,15 +47,14 @@ function Menu() {
         ))}
       </div>
 
-      {/* CONTEÚDO */}
       <div className="conteudo">
         <Routes>
           <Route path="/" element={<h1>Home</h1>} />
           <Route path="produtos" element={<Produtos />} /> 
-          <Route path="fornecedores" element={<h1>Fornecedores</h1>} />
-          <Route path="estoque" element={<h1>Estoque</h1>} />
+          <Route path="fornecedores" element={<Fornecedores />} />
           <Route path="relatorios" element={<h1>Relatórios</h1>} />
-          <Route path="vendas" element={<h1>Vendas</h1>} />
+          <Route path="compras" element={<Compras />} />
+          <Route path="vendas" element={<Vendas />} />
           <Route path="configuracoes" element={<h1>Configurações</h1>} />
         </Routes>
       </div>

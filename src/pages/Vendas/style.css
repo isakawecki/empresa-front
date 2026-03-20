@@ -1,0 +1,102 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+}
+
+.container {
+  padding: 20px;
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin: 0;
+}
+
+button {
+  background: #292929;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+button:hover {
+  background: #0f0f0f;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th {
+  background: #292929;
+  color: white;
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background: #f1f2f6;
+}
+
+img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* FORM */
+.form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input, select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* MODAL */
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acoes {
+  display: flex;
+  justify-content: space-between;
+}
