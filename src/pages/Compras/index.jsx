@@ -139,9 +139,9 @@ export default function Compras() {
     return formCompra.itens.reduce((acc, i) => acc + i.total, 0);
   };
 
-  // ========================
+
   // SALVAR COMPRA
-  // ========================
+ 
   const salvarCompra = () => {
     if (!formCompra.data || !formCompra.fornecedor || formCompra.itens.length === 0) {
       alert("Preencha tudo");

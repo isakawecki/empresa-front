@@ -1,23 +1,60 @@
 import "./style.css";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+
 import perfilIcon from "../../assets/perfil.png";
 import cadeadoIcon from "../../assets/cadeado.png";
 
 function Login() {
   const navigate = useNavigate();
+
+  // 🧠 estados para guardar os inputs
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  // 🔐 função de login
+  const fazerLogin = async () => {
+    try {
+      const resposta = await axios.post("http://localhost:5000/login", {
+        email,
+        senha,
+      });
+
+      if (resposta.data.status === "ok") {
+        navigate("/menu");
+      } else {
+        alert("Email ou senha inválidos");
+      }
+    } catch (erro) {
+      console.log(erro);
+      alert("Erro ao conectar com o servidor");
+    }
+  };
+
   return (
     <div className="container-principal">
       <div className="caixa-login">
         <h2>LOGIN</h2>
 
+   
         <div className="campo-input">
           <img src={perfilIcon} className="icone-input" />
-          <input type="text" placeholder="Usuário" />
+          <input
+            type="text"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
 
+    
         <div className="campo-input">
           <img src={cadeadoIcon} className="icone-input" />
-          <input type="password" placeholder="Senha" />
+          <input
+            type="password"
+            placeholder="Senha"
+            onChange={(e) => setSenha(e.target.value)}
+          />
         </div>
 
         <div className="opcoes">
@@ -29,7 +66,8 @@ function Login() {
           <span className="esqueceu-senha">Esqueceu a senha?</span>
         </div>
 
-        <button onClick={() => navigate("/menu")}>Entrar</button>
+
+        <button onClick={fazerLogin}>Entrar</button>
 
         <div className="divisor">OU</div>
 
