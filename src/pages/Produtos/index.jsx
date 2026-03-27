@@ -15,7 +15,7 @@ export default function Produtos() {
   const [modalAdd, setModalAdd] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
 
-  // 🔥 carregar produtos
+
   useEffect(() => {
     const carregar = () => {
       const dados = JSON.parse(localStorage.getItem("produtos")) || [];
@@ -24,7 +24,7 @@ export default function Produtos() {
 
     carregar();
 
-    // escuta atualização vinda da venda
+   
     window.addEventListener("produtosAtualizados", carregar);
 
     return () => {
@@ -32,7 +32,7 @@ export default function Produtos() {
     };
   }, []);
 
-  // salvar sempre que mudar
+  
   useEffect(() => {
     localStorage.setItem("produtos", JSON.stringify(produtos));
   }, [produtos]);
@@ -59,7 +59,7 @@ export default function Produtos() {
     setProdutos(novos);
     localStorage.setItem("produtos", JSON.stringify(novos));
 
-    // 🔥 avisa outras telas
+  
     window.dispatchEvent(new Event("produtosAtualizados"));
 
     limparForm();
@@ -85,7 +85,7 @@ export default function Produtos() {
     setProdutos(atualizados);
     localStorage.setItem("produtos", JSON.stringify(atualizados));
 
-    // 🔥 avisa atualização
+  
     window.dispatchEvent(new Event("produtosAtualizados"));
 
     setSelecionado(form);
@@ -137,7 +137,7 @@ export default function Produtos() {
         </table>
       </div>
 
-      {/* DETALHE */}
+     
       {selecionado && (
         <div className="detalhe">
           <div className="topo-detalhe">
@@ -156,7 +156,7 @@ export default function Produtos() {
         </div>
       )}
 
-      {/* MODAL ADD */}
+  
       {modalAdd && (
         <div className="modal-bg">
           <div className="modal">
@@ -176,7 +176,7 @@ export default function Produtos() {
         </div>
       )}
 
-      {/* MODAL EDIT */}
+  
       {modalEdit && (
         <div className="modal-bg">
           <div className="modal">
