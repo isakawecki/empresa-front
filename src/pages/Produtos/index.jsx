@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "./style.css";
 
 export default function Produtos() {
@@ -15,83 +16,70 @@ export default function Produtos() {
   const [modalAdd, setModalAdd] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
 
-
+ 
   useEffect(() => {
-    const carregar = () => {
-      const dados = JSON.parse(localStorage.getItem("produtos")) || [];
-      setProdutos(dados);
-    };
-
-    carregar();
-
-   
-    window.addEventListener("produtosAtualizados", carregar);
-
-    return () => {
-      window.removeEventListener("produtosAtualizados", carregar);
-    };
+    carregarProdutos();
   }, []);
 
-  
-  useEffect(() => {
-    localStorage.setItem("produtos", JSON.stringify(produtos));
-  }, [produtos]);
+  const carregarProdutos = async () => {
+    try {
+      const resposta = await axios.get("http://localhost:5000/produtos");
+      setProdutos(resposta.data);
+    } catch (erro) {
+      console.log(erro);
+      alert("Erro ao carregar produtos");
+    }
+  };
 
+ 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const adicionarProduto = () => {
+
+  const adicionarProduto = async () => {
     if (!form.nome || !form.preco || !form.estoque) {
       alert("Preencha os campos");
       return;
     }
 
-    const novo = {
-      ...form,
-      id: Date.now(),
-      preco: Number(form.preco),
-      estoque: Number(form.estoque),
-    };
+    try {
+      await axios.post("http://localhost:5000/produtos", form);
+      await carregarProdutos();
 
-    const novos = [...produtos, novo];
-
-    setProdutos(novos);
-    localStorage.setItem("produtos", JSON.stringify(novos));
-
-  
-    window.dispatchEvent(new Event("produtosAtualizados"));
-
-    limparForm();
-    setModalAdd(false);
+      limparForm();
+      setModalAdd(false);
+    } catch (erro) {
+      console.log(erro);
+      alert("Erro ao adicionar");
+    }
   };
+
 
   const abrirEditar = () => {
     setForm(selecionado);
     setModalEdit(true);
   };
 
-  const salvarEdicao = () => {
-    const atualizados = produtos.map((p) =>
-      p.id === form.id
-        ? {
-            ...form,
-            preco: Number(form.preco),
-            estoque: Number(form.estoque),
-          }
-        : p
-    );
 
-    setProdutos(atualizados);
-    localStorage.setItem("produtos", JSON.stringify(atualizados));
+  const salvarEdicao = async () => {
+    try {
+      await axios.put(
+        `http://localhost:5000/produtos/${form.id}`,
+        form
+      );
 
-  
-    window.dispatchEvent(new Event("produtosAtualizados"));
+      await carregarProdutos();
 
-    setSelecionado(form);
-    limparForm();
-    setModalEdit(false);
+      setSelecionado(form);
+      limparForm();
+      setModalEdit(false);
+    } catch (erro) {
+      console.log(erro);
+      alert("Erro ao editar");
+    }
   };
+
 
   const limparForm = () => {
     setForm({
@@ -126,7 +114,9 @@ export default function Produtos() {
           <tbody>
             {produtos.map((p) => (
               <tr key={p.id} onClick={() => setSelecionado(p)}>
-                <td><img src={p.foto} alt="" /></td>
+                <td>
+                  <img src={p.foto} alt="" />
+                </td>
                 <td>{p.nome}</td>
                 <td>{p.descricao}</td>
                 <td>{p.estoque}</td>
@@ -137,7 +127,7 @@ export default function Produtos() {
         </table>
       </div>
 
-     
+  
       {selecionado && (
         <div className="detalhe">
           <div className="topo-detalhe">
@@ -156,7 +146,7 @@ export default function Produtos() {
         </div>
       )}
 
-  
+ 
       {modalAdd && (
         <div className="modal-bg">
           <div className="modal">
@@ -166,7 +156,7 @@ export default function Produtos() {
             <input name="descricao" value={form.descricao} onChange={handleChange} placeholder="Descrição" />
             <input name="preco" type="number" value={form.preco} onChange={handleChange} placeholder="Preço" />
             <input name="estoque" type="number" value={form.estoque} onChange={handleChange} placeholder="Estoque" />
-            <input name="foto" value={form.foto} onChange={handleChange} placeholder="Imagem" />
+            <input name="foto" value={form.foto} onChange={handleChange} placeholder="URL da imagem" />
 
             <div className="acoes">
               <button onClick={adicionarProduto}>Salvar</button>
@@ -176,7 +166,7 @@ export default function Produtos() {
         </div>
       )}
 
-  
+
       {modalEdit && (
         <div className="modal-bg">
           <div className="modal">
