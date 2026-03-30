@@ -9,28 +9,31 @@ import cadeadoIcon from "../../assets/cadeado.png";
 function Login() {
   const navigate = useNavigate();
 
-  // 🧠 estados para guardar os inputs
+
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  // 🔐 função de login
-  const fazerLogin = async () => {
-    try {
-      const resposta = await axios.post("http://localhost:5000/login", {
+
+const fazerLogin = async () => {
+  try {
+    const resposta = await axios.post(
+      "http://localhost/gest-o-de-estoque-main/index.php?url=login",
+      {
         email,
         senha,
-      });
-
-      if (resposta.data.status === "ok") {
-        navigate("/menu");
-      } else {
-        alert("Email ou senha inválidos");
       }
-    } catch (erro) {
-      console.log(erro);
-      alert("Erro ao conectar com o servidor");
+    );
+
+    if (resposta.data.status === "ok") {
+      navigate("/menu");
+    } else {
+      alert(resposta.data.message || "Email ou senha inválidos");
     }
-  };
+  } catch (erro) {
+    console.log(erro);
+    alert("Erro ao conectar com o servidor");
+  }
+};
 
   return (
     <div className="container-principal">
