@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import "./style.css";
 
 export default function Produtos() {
-  const [produtos, setProdutos] = useState([]);
+
+  const [produtos, setProdutos] =
+    useState([]);
+
   const [form, setForm] = useState({
     id: null,
     nome: "",
@@ -12,76 +14,138 @@ export default function Produtos() {
     estoque: "",
     foto: "",
   });
-  const [selecionado, setSelecionado] = useState(null);
-  const [modalAdd, setModalAdd] = useState(false);
-  const [modalEdit, setModalEdit] = useState(false);
 
- 
+  const [selecionado, setSelecionado] =
+    useState(null);
+
+  const [modalAdd, setModalAdd] =
+    useState(false);
+
+  const [modalEdit, setModalEdit] =
+    useState(false);
+
+  // ===== CARREGAR PRODUTOS =====
+  const carregarProdutos = () => {
+
+    const produtosSalvos =
+      JSON.parse(
+        localStorage.getItem("produtos")
+      ) || [];
+
+    setProdutos(produtosSalvos);
+  };
+
+  // ===== USE EFFECT =====
   useEffect(() => {
+
     carregarProdutos();
+
+    window.addEventListener(
+      "produtosAtualizados",
+      carregarProdutos
+    );
+
+    return () =>
+      window.removeEventListener(
+        "produtosAtualizados",
+        carregarProdutos
+      );
+
   }, []);
 
-  const carregarProdutos = async () => {
-    try {
-      const resposta = await axios.get("http://localhost:5000/produtos");
-      setProdutos(resposta.data);
-    } catch (erro) {
-      console.log(erro);
-      alert("Erro ao carregar produtos");
-    }
-  };
-
- 
+  // ===== INPUT =====
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+
   };
 
+  // ===== ADICIONAR =====
+  const adicionarProduto = () => {
 
-  const adicionarProduto = async () => {
-    if (!form.nome || !form.preco || !form.estoque) {
+    if (
+      !form.nome ||
+      !form.preco ||
+      !form.estoque
+    ) {
       alert("Preencha os campos");
       return;
     }
 
-    try {
-      await axios.post("http://localhost:5000/produtos", form);
-      await carregarProdutos();
+    const novoProduto = {
 
-      limparForm();
-      setModalAdd(false);
-    } catch (erro) {
-      console.log(erro);
-      alert("Erro ao adicionar");
-    }
+      ...form,
+
+      id: Date.now(),
+    };
+
+    const novaLista = [
+      ...produtos,
+      novoProduto,
+    ];
+
+    localStorage.setItem(
+      "produtos",
+      JSON.stringify(novaLista)
+    );
+
+    setProdutos(novaLista);
+
+    limparForm();
+
+    setModalAdd(false);
+
+    alert("Produto adicionado!");
   };
 
-
+  // ===== ABRIR EDIÇÃO =====
   const abrirEditar = () => {
+
     setForm(selecionado);
+
     setModalEdit(true);
+
   };
 
+  // ===== SALVAR EDIÇÃO =====
+  const salvarEdicao = () => {
 
-  const salvarEdicao = async () => {
-    try {
-      await axios.put(
-        `http://localhost:5000/produtos/${form.id}`,
-        form
-      );
+    const novaLista = produtos.map(
+      (produto) => {
 
-      await carregarProdutos();
+        if (
+          produto.id === form.id
+        ) {
 
-      setSelecionado(form);
-      limparForm();
-      setModalEdit(false);
-    } catch (erro) {
-      console.log(erro);
-      alert("Erro ao editar");
-    }
+          return form;
+        }
+
+        return produto;
+      }
+    );
+
+    localStorage.setItem(
+      "produtos",
+      JSON.stringify(novaLista)
+    );
+
+    setProdutos(novaLista);
+
+    setSelecionado(form);
+
+    limparForm();
+
+    setModalEdit(false);
+
+    alert("Produto editado!");
   };
 
-
+  // ===== LIMPAR =====
   const limparForm = () => {
+
     setForm({
       id: null,
       nome: "",
@@ -90,18 +154,33 @@ export default function Produtos() {
       estoque: "",
       foto: "",
     });
+
   };
 
   return (
     <div className="container-produtos">
+
+      {/* LISTA */}
       <div className="lista">
+
         <div className="topo">
+
           <h2>Produtos</h2>
-          <button onClick={() => setModalAdd(true)}>+ Adicionar</button>
+
+          <button
+            onClick={() =>
+              setModalAdd(true)
+            }
+          >
+            + Adicionar
+          </button>
+
         </div>
 
         <table>
+
           <thead>
+
             <tr>
               <th>Imagem</th>
               <th>Nome</th>
@@ -109,82 +188,247 @@ export default function Produtos() {
               <th>Estoque</th>
               <th>Preço</th>
             </tr>
+
           </thead>
 
           <tbody>
+
             {produtos.map((p) => (
-              <tr key={p.id} onClick={() => setSelecionado(p)}>
+
+              <tr
+                key={p.id}
+                onClick={() =>
+                  setSelecionado(p)
+                }
+              >
+
                 <td>
-                  <img src={p.foto} alt="" />
+
+                  <img
+                    src={p.foto}
+                    alt=""
+                  />
+
                 </td>
+
                 <td>{p.nome}</td>
-                <td>{p.descricao}</td>
+
+                <td>
+                  {p.descricao}
+                </td>
+
                 <td>{p.estoque}</td>
-                <td>R$ {p.preco}</td>
+
+                <td>
+                  R$ {p.preco}
+                </td>
+
               </tr>
+
             ))}
+
           </tbody>
+
         </table>
+
       </div>
 
-  
+      {/* DETALHE */}
       {selecionado && (
+
         <div className="detalhe">
+
           <div className="topo-detalhe">
+
             <h3>Produto</h3>
-            <button onClick={() => setSelecionado(null)}>X</button>
+
+            <button
+              onClick={() =>
+                setSelecionado(null)
+              }
+            >
+              Fechar
+            </button>
+
           </div>
 
-          <img src={selecionado.foto} alt="" />
+          <img
+            src={selecionado.foto}
+            alt=""
+          />
 
-          <p><b>Nome:</b> {selecionado.nome}</p>
-          <p><b>Descrição:</b> {selecionado.descricao}</p>
-          <p><b>Preço:</b> R$ {selecionado.preco}</p>
-          <p><b>Estoque:</b> {selecionado.estoque}</p>
+          <p>
+            <b>Nome:</b>
+            {" "}
+            {selecionado.nome}
+          </p>
 
-          <button onClick={abrirEditar}>Editar</button>
+          <p>
+            <b>Descrição:</b>
+            {" "}
+            {selecionado.descricao}
+          </p>
+
+          <p>
+            <b>Preço:</b>
+            {" "}
+            R$ {selecionado.preco}
+          </p>
+
+          <p>
+            <b>Estoque:</b>
+            {" "}
+            {selecionado.estoque}
+          </p>
+
+          <button
+            onClick={abrirEditar}
+          >
+            Editar
+          </button>
+
         </div>
       )}
 
- 
+      {/* MODAL ADD */}
       {modalAdd && (
-        <div className="modal-bg">
-          <div className="modal">
-            <h3>Adicionar Produto</h3>
 
-            <input name="nome" value={form.nome} onChange={handleChange} placeholder="Nome" />
-            <input name="descricao" value={form.descricao} onChange={handleChange} placeholder="Descrição" />
-            <input name="preco" type="number" value={form.preco} onChange={handleChange} placeholder="Preço" />
-            <input name="estoque" type="number" value={form.estoque} onChange={handleChange} placeholder="Estoque" />
-            <input name="foto" value={form.foto} onChange={handleChange} placeholder="URL da imagem" />
+        <div className="modal-bg">
+
+          <div className="modal">
+
+            <h3>
+              Adicionar Produto
+            </h3>
+
+            <input
+              name="nome"
+              value={form.nome}
+              onChange={handleChange}
+              placeholder="Nome"
+            />
+
+            <input
+              name="descricao"
+              value={form.descricao}
+              onChange={handleChange}
+              placeholder="Descrição"
+            />
+
+            <input
+              name="preco"
+              type="number"
+              value={form.preco}
+              onChange={handleChange}
+              placeholder="Preço"
+            />
+
+            <input
+              name="estoque"
+              type="number"
+              value={form.estoque}
+              onChange={handleChange}
+              placeholder="Estoque"
+            />
+
+            <input
+              name="foto"
+              value={form.foto}
+              onChange={handleChange}
+              placeholder="URL da imagem"
+            />
 
             <div className="acoes">
-              <button onClick={adicionarProduto}>Salvar</button>
-              <button onClick={() => setModalAdd(false)}>Cancelar</button>
+
+              <button
+                onClick={
+                  adicionarProduto
+                }
+              >
+                Salvar
+              </button>
+
+              <button
+                onClick={() =>
+                  setModalAdd(false)
+                }
+              >
+                Cancelar
+              </button>
+
             </div>
+
           </div>
+
         </div>
       )}
 
-
+      {/* MODAL EDIT */}
       {modalEdit && (
-        <div className="modal-bg">
-          <div className="modal">
-            <h3>Editar Produto</h3>
 
-            <input name="nome" value={form.nome} onChange={handleChange} />
-            <input name="descricao" value={form.descricao} onChange={handleChange} />
-            <input name="preco" type="number" value={form.preco} onChange={handleChange} />
-            <input name="estoque" type="number" value={form.estoque} onChange={handleChange} />
-            <input name="foto" value={form.foto} onChange={handleChange} />
+        <div className="modal-bg">
+
+          <div className="modal">
+
+            <h3>
+              Editar Produto
+            </h3>
+
+            <input
+              name="nome"
+              value={form.nome}
+              onChange={handleChange}
+            />
+
+            <input
+              name="descricao"
+              value={form.descricao}
+              onChange={handleChange}
+            />
+
+            <input
+              name="preco"
+              type="number"
+              value={form.preco}
+              onChange={handleChange}
+            />
+
+            <input
+              name="estoque"
+              type="number"
+              value={form.estoque}
+              onChange={handleChange}
+            />
+
+            <input
+              name="foto"
+              value={form.foto}
+              onChange={handleChange}
+            />
 
             <div className="acoes">
-              <button onClick={salvarEdicao}>Salvar</button>
-              <button onClick={() => setModalEdit(false)}>Cancelar</button>
+
+              <button
+                onClick={salvarEdicao}
+              >
+                Salvar
+              </button>
+
+              <button
+                onClick={() =>
+                  setModalEdit(false)
+                }
+              >
+                Cancelar
+              </button>
+
             </div>
+
           </div>
+
         </div>
       )}
+
     </div>
   );
 }

@@ -35,14 +35,18 @@ body {
   top: 50%;
   transform: translateY(-50%);
   width: 18px;
+  height: 15px;
+  color: #2f2d2d;
   pointer-events: none;
 }
 
 .campo-input input {
   width: 100%;
-  padding: 10px 10px 10px 30px; 
+  padding: 10px 10px 10px 50px; 
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 14px;
+  outline: none;
 }
 
 

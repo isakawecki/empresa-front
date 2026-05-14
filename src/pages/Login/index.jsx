@@ -1,86 +1,197 @@
-import "./style.css";
+import "./login.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
 
 import perfilIcon from "../../assets/perfil.png";
 import cadeadoIcon from "../../assets/cadeado.png";
 
 function Login() {
+
   const navigate = useNavigate();
 
+  const [email, setEmail] =
+    useState("");
 
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [senha, setSenha] =
+    useState("");
 
+  // ===== CRIA ADMIN PADRÃO =====
+  const adminExiste =
+    localStorage.getItem("admin");
 
-const fazerLogin = async () => {
-  try {
-    const resposta = await axios.post(
-      "http://localhost/gest-o-de-estoque-main/index.php?url=login",
-      {
-        email,
-        senha,
-      }
+  if (!adminExiste) {
+
+    const adminPadrao = {
+
+      nome: "Administrador",
+
+      email: "admin@empresa.com",
+
+      senha: "123",
+
+      vendas: 0,
+
+      faturamento: 0,
+    };
+
+    localStorage.setItem(
+      "admin",
+      JSON.stringify(adminPadrao)
+    );
+  }
+
+  // ===== LOGIN =====
+  const fazerLogin = () => {
+
+    // ===== ADMIN =====
+    const admin = JSON.parse(
+      localStorage.getItem("admin")
     );
 
-    if (resposta.data.status === "ok") {
+    if (
+      admin &&
+      email === admin.email &&
+      senha === admin.senha
+    ) {
+
+      localStorage.setItem(
+        "logado",
+        "true"
+      );
+
+      localStorage.setItem(
+        "tipoUsuario",
+        "admin"
+      );
+
+      // salva usuário logado
+      localStorage.setItem(
+        "usuarioLogado",
+        admin.email
+      );
+
+      alert("Login ADM realizado!");
+
       navigate("/menu");
-    } else {
-      alert(resposta.data.message || "Email ou senha inválidos");
+
+      return;
     }
-  } catch (erro) {
-    console.log(erro);
-    alert("Erro ao conectar com o servidor");
-  }
-};
+
+    // ===== FUNCIONÁRIOS =====
+    const funcionarios =
+      JSON.parse(
+        localStorage.getItem(
+          "funcionarios"
+        )
+      ) || [];
+
+    const funcionarioEncontrado =
+      funcionarios.find(
+        (funcionario) =>
+
+          funcionario.email === email &&
+          funcionario.senha === senha
+      );
+
+    if (funcionarioEncontrado) {
+
+      localStorage.setItem(
+        "logado",
+        "true"
+      );
+
+      localStorage.setItem(
+        "tipoUsuario",
+        "funcionario"
+      );
+
+      // salva funcionário logado
+      localStorage.setItem(
+        "usuarioLogado",
+        funcionarioEncontrado.email
+      );
+
+      alert("Login realizado!");
+
+      navigate("/menu");
+
+      return;
+    }
+
+    alert("Email ou senha inválidos");
+  };
 
   return (
     <div className="container-principal">
+
       <div className="caixa-login">
+
         <h2>LOGIN</h2>
 
-   
+        {/* EMAIL */}
         <div className="campo-input">
-          <img src={perfilIcon} className="icone-input" />
+
+          <img
+            src={perfilIcon}
+            className="icone-input"
+          />
+
           <input
             type="text"
             placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(
+                e.target.value
+              )
+            }
           />
+
         </div>
 
-    
+        {/* SENHA */}
         <div className="campo-input">
-          <img src={cadeadoIcon} className="icone-input" />
+
+          <img
+            src={cadeadoIcon}
+            className="icone-input"
+          />
+
           <input
             type="password"
             placeholder="Senha"
-            onChange={(e) => setSenha(e.target.value)}
+            onChange={(e) =>
+              setSenha(
+                e.target.value
+              )
+            }
           />
+
         </div>
 
+        {/* OPÇÕES */}
         <div className="opcoes">
+
           <label>
+
             <input type="checkbox" />
+
             Lembrar de mim
+
           </label>
 
-          <span className="esqueceu-senha">Esqueceu a senha?</span>
+          <span className="esqueceu-senha">
+            Esqueceu a senha?
+          </span>
+
         </div>
 
+        {/* BOTÃO */}
+        <button onClick={fazerLogin}>
+          Entrar
+        </button>
 
-        <button onClick={fazerLogin}>Entrar</button>
-
-        <div className="divisor">OU</div>
-
-        <p>
-          Primeiro acesso?{" "}
-          <span className="cadastrar" onClick={() => navigate("/cadastro")}>
-            Cadastre-se
-          </span>
-        </p>
       </div>
+
     </div>
   );
 }
